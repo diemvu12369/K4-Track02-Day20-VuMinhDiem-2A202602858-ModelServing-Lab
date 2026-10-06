@@ -8,7 +8,7 @@
 
 **Họ Tên:** Vũ Minh Điềm
 **MSSV:** 2A202602858
-**Cohort:** K4 (Track 02)
+**Cohort:** 4 - K4 (Track 02)
 **Ngày submit:** 2026-10-06
 
 ---
@@ -45,17 +45,18 @@ track chạy trên CPU.
 
 | Quantization | Size (GB) | Load (ms) | TTFT P50/P95 (ms) | TPOT P50/P95 (ms) | E2E P50/P95/P99 (ms) | Decode (tok/s) |
 |---|--:|--:|--:|--:|--:|--:|
-| UD-Q4_K_XL | 2.97 | 4727 | 600 / 681 | 78.7 / 138.9 | 5310 / 9293 / 9293 | 12.7 |
-| UD-Q2_K_XL | 2.24 | 5135 | 823 / 1257 | 79.5 / 161.4 | 5476 / 11423 / 11423 | 12.6 |
+| UD-Q4_K_XL | 2.97 | 5916 | 631 / 837 | 80.9 / 127.0 | 5729 / 6787 / 6787 | 12.4 |
+| UD-Q2_K_XL | 2.24 | 9223 | 780 / 868 | 74.7 / 85.6 | 5209 / 6164 / 6164 | 13.4 |
 
-(`threads=8`, `ngl=0`, `ctx=2048`, `max_tokens=64`, 10 request mỗi quant.)
+(`threads=8`, `ngl=0`, `ctx=2048`, `max_tokens=64`, 10 request mỗi quant. Đây là lần chạy
+thứ 3, trùng với screenshot `02b-bench-table.png`.)
 
 **Quan sát** (≤ 60 chữ):
 
-2-bit nhỏ hơn 25% nhưng decode **không nhanh hơn** (12.6 vs 12.7 tok/s), còn TTFT P50 chậm
-hơn 37%: trên CPU, chi phí dequantize K-quant 2-bit ăn hết phần bandwidth tiết kiệm được.
-Hỏi cùng 3 câu trên cả hai: toán đều đúng, nhưng bản 2-bit dịch sai "continuous batching"
-thành "hàng đợi liên tục". Không đáng, trừ khi thiếu RAM.
+Lần này 2-bit decode nhanh hơn 1.08×, nhưng qua 3 lần chạy tỉ lệ dao động 0.90×–1.08×,
+tức nằm trong nhiễu; TTFT thì cả 3 lần 2-bit đều chậm hơn (lần này +24%). Hỏi cùng 3 câu
+trên cả hai: toán đều đúng, nhưng 2-bit dịch sai "continuous batching" thành "hàng đợi
+liên tục". Không đáng, trừ khi thiếu RAM.
 
 ---
 
@@ -80,7 +81,7 @@ chạy): 3.76 / 4 slots (`requests_deferred` lên tới 46)
 
 **Saturation reading** (≤ 80 chữ):
 
-Bão hoà ngay từ 10 users: effective concurrency 5.8 > 4 slot, P50 34 s so với ~5.3 s của
+Bão hoà ngay từ 10 users: effective concurrency 5.8 > 4 slot, P50 34 s so với ~5.3–5.7 s của
 một request đơn lẻ. Lên 50 users throughput không tăng (0.76×) nhưng P95 tăng 1.63×. Phần
 thêm là queue time: 4 slot luôn bận, 46 request deferred, tốc độ decode không đổi. Với
 SLO P95 ≤ 10 s thì goodput = 0. Knob đổi trước: GPU offload, vì trần là bandwidth RAM
@@ -130,7 +131,7 @@ after:   13.1 tok/s  (tg128, -t 4)
 speedup: 1.18×
 ```
 
-Kiểm chứng qua HTTP: `make bench` ở `-t 8` cho decode 12.7 tok/s; smoke test trên
+Kiểm chứng qua HTTP: `make bench` ở `-t 8` cho decode 12.4–12.9 tok/s qua 3 lần chạy; smoke test trên
 `make serve` với `LAB_N_THREADS=4` đo được 13.6 tok/s.
 
 **Tại sao nó work:**

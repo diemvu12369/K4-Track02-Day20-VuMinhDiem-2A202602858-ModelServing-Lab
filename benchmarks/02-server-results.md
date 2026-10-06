@@ -37,7 +37,7 @@ Throughput moved 0.76x while P95 moved 1.63x. That gap is the goodput argument: 
 
 **Server đã bão hoà ngay từ 10 users.** Bằng chứng thuyết phục nhất: ở 10 users,
 effective concurrency đã là **5.8 > 4 slot**, và P50 = 34 s trong khi một request đơn lẻ
-(64 token) chỉ mất ~5.3 s E2E trong `make bench`, tức phần lớn thời gian là chờ. Lên 50
+(64 token) chỉ mất ~5.3–5.7 s E2E (P50) trong `make bench`, tức phần lớn thời gian là chờ. Lên 50
 users (offered load gấp 5) throughput **không tăng** (0.23 → 0.17 RPS, 0.76×; mức giảm nằm
 trong nhiễu vì chỉ có 8–10 request hoàn thành), trong khi P95 phồng **1.63×** (35 s → 57 s).
 `make metrics` xác nhận: 4/4 slot bận, 46 request bị deferred.
@@ -47,7 +47,7 @@ Phần latency tăng thêm là **queue time, không phải compute time**. Số 
 Little's Law (6.2 > 4) và `requests_deferred > 0` đều chỉ ra điều đó.
 
 **goodput@SLO**: tôi chọn SLO là P95 E2E ≤ 10 s cho câu trả lời 64 token. Một user đơn lẻ
-đạt SLO (~5.3 s), nhưng ở cả 10 lẫn 50 users **không request nào** đạt (min 16.5 s và
+đạt SLO (~5.3–5.7 s), nhưng ở cả 10 lẫn 50 users **không request nào** đạt (min 16.5 s và
 20.6 s), nên goodput = 0 req/s dù throughput > 0. Đó chính là khoảng cách giữa peak
 throughput và goodput.
 

@@ -43,4 +43,4 @@ LAB_N_THREADS=4 make bench
 
 Kết luận: mặc định "số physical core = 8" của lab sai trên CPU hybrid. Đặt `-t 4` cho
 decode nhanh hơn **1.18×** so với mặc định. Tôi dùng `LAB_N_THREADS=4` cho `make serve`;
-smoke test đo được 13.6 tok/s decode qua HTTP, so với 12.7 tok/s của `make bench` ở `-t 8`.
+smoke test đo được 13.6 tok/s decode qua HTTP, so với 12.4–12.9 tok/s của `make bench` ở `-t 8` (3 lần chạy).
